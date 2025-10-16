@@ -5,10 +5,11 @@ import personnages.Druide;
 import personnages.Gaulois;
 import villagegaulois.Etal;
 import villagegaulois.Village;
+import villagegaulois.Village.VillageSansChefException;
 
 public class Scenario {
 
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		Village village = new Village("le village des irréductibles", 10, 5);
 		Chef abraracourcix = new Chef("Abraracourcix", 10, village);
 		village.setChef(abraracourcix);
@@ -24,7 +25,12 @@ public class Scenario {
 		village.ajouterHabitant(obelix);
 		village.ajouterHabitant(druide);
 		village.ajouterHabitant(abraracourcix);
-		village.afficherVillageois();
+		try {
+		    village.afficherVillageois();
+		} catch (Village.VillageSansChefException e) {
+		    System.err.println("Erreur : " + e.getMessage());
+		}
+
 
 		System.out.println(village.rechercherVendeursProduit("fleurs"));
 		System.out.println(village.installerVendeur(bonemine, "fleurs", 20));
@@ -35,12 +41,19 @@ public class Scenario {
 		System.out.println(village.installerVendeur(druide, "fleurs", 10));
 
 		System.out.println(village.rechercherVendeursProduit("fleurs"));
+		
 		Etal etalFleur = village.rechercherEtal(bonemine);
-		System.out.println(etalFleur.acheterProduit(10, abraracourcix));
-		System.out.println(etalFleur.acheterProduit(15, obelix));
-		System.out.println(etalFleur.acheterProduit(15, assurancetourix));
-		System.out.println(village.partirVendeur(bonemine));
-		System.out.println(village.afficherMarche());
+		if (etalFleur != null && etalFleur.isEtalOccupe()) {
+		    System.out.println(etalFleur.acheterProduit(10, abraracourcix));
+		    System.out.println(etalFleur.acheterProduit(15, obelix));
+		    System.out.println(etalFleur.acheterProduit(15, assurancetourix));
+		    System.out.println(village.partirVendeur(bonemine));
+		    System.out.println(village.afficherMarche());
+		} else {
+		    System.out.println("Bonemine n'est pas installée sur un étal, aucun achat possible.");
+		    System.out.println(village.afficherMarche());
+		}
+
 	}
 
 }
